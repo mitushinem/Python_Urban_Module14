@@ -25,11 +25,26 @@ age INTEGER
 
 #cur.execute("SELECT * FROM Users")
 #cur.execute("SELECT username, age FROM Users WHERE age > ?", (29,))
+#
+# cur.execute("SELECT age, AVG(age) FROM Users GROUP BY age")
+# users = cur.fetchall()
+# for user in users:
+#     print(user)
 
-cur.execute("SELECT age, AVG(age) FROM Users GROUP BY age")
-users = cur.fetchall()
-for user in users:
-    print(user)
+cur.execute('SELECT COUNT(*) FROM Users')
+
+cur.execute('SELECT SUM(age) FROM Users')
+total1 = cur.fetchone()[0]
+cur.execute('SELECT COUNT(*) FROM Users')
+total2 = cur.fetchone()[0]
+print(total1)
+print(total2)
+print(total1, total1/total2)
+
+
+cur.execute('SELECT AVG(age) FROM Users')
+print(cur.fetchone()[0])
+
 
 conn.commit()
 conn.close()
