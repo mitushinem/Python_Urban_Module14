@@ -13,37 +13,46 @@ age INTEGER
 )
 ''')
 
-#cur.execute('''CREATE INDEX IF NOT EXISTS idx_email ON Users (email)''')
+def add_user(user_id, username, first_name):
+    check_user = cur.execute("SELECT * FROM Users WHERE id = ?", (user_id, ))
 
-# for i in range(30):
-#     cur.execute("INSERT INTO Users (username, email, age) VALUES (?, ?, ?)", (f"newuser{i}", f"ex{1}@gmail.com", randint(20, 60)))
-
-#cur.execute("UPDATE Users SET age = ? WHERE username = ?", (29, 'newuser'))
-
-# for i in range(30):
-#     cur.execute("DELETE FROM Users WHERE username = ?", (f'newuser{i}',))
-
-#cur.execute("SELECT * FROM Users")
-#cur.execute("SELECT username, age FROM Users WHERE age > ?", (29,))
-#
-# cur.execute("SELECT age, AVG(age) FROM Users GROUP BY age")
-# users = cur.fetchall()
-# for user in users:
-#     print(user)
-
-cur.execute('SELECT COUNT(*) FROM Users')
-
-cur.execute('SELECT SUM(age) FROM Users')
-total1 = cur.fetchone()[0]
-cur.execute('SELECT COUNT(*) FROM Users')
-total2 = cur.fetchone()[0]
-print(total1)
-print(total2)
-print(total1, total1/total2)
+    if check_user.fetchone() is None:
+        cur.execute(f"""
+        INSERT INTO Users VALUES('{user_id}','{username}','{first_name}',0)
+        """)
 
 
-cur.execute('SELECT AVG(age) FROM Users')
-print(cur.fetchone()[0])
+def show_users():
+    users_list = cur.execute("SELECT * FROM Users")
+    message = ''
+    for user in users_list:
+        message += f"{user[0]}@{user[1]} {user[2]}\n"
+    conn.commit()
+    return message
+
+
+def show_stat():
+    count_users = cur.execute("SELECT COUNT(*) FROM Users").fetchone()[0]
+    conn.commit()
+
+    return count_users
+
+def remove_blacklist(inpup_id):
+    cur.execute('UPDATE Users SET block = ? WHERE id = ?', (0, inpup_id,))
+    conn.commit()
+
+def add_to_blacklist(inpup_id):
+    cur.execute('UPDATE Users SET block = ? WHERE id = ?', (1, inpup_id,))
+    conn.commit()
+
+def check_block(user_id):
+    users = cur.execute(f"SELECT block FROM Users WHERE id = {user_id}").fetchone()[0]
+    return users
+
+
+
+
+
 
 
 conn.commit()
